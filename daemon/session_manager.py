@@ -99,11 +99,7 @@ class SessionManager:
             val_stderr = open(os.path.join(log_dir, "val-stderr.log"), "w")
 
             self._val_proc = subprocess.Popen(
-                [
-                    venv_python, main_py,
-                    "--mode", "phone",
-                    "--claude-session", session_id,
-                ],
+                [venv_python, main_py, "--mode", "phone"],
                 cwd=agent_dir,
                 stdout=val_stdout,
                 stderr=val_stderr,
