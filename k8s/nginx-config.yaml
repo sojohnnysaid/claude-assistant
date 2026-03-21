@@ -42,10 +42,19 @@ data:
             proxy_pass http://backend;
         }
 
-        # Everything else -> frontend
+        # SvelteKit immutable assets (content-hashed, cache forever)
+        location /_app/immutable/ {
+            proxy_pass http://frontend;
+            proxy_set_header Host $host;
+            proxy_intercept_errors on;
+            add_header Cache-Control "public, max-age=31536000, immutable" always;
+        }
+
+        # Everything else -> frontend (no Cloudflare caching for dynamic pages)
         location / {
             proxy_pass http://frontend;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
+            add_header Cache-Control "no-cache" always;
         }
     }
