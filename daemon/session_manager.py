@@ -92,13 +92,23 @@ class SessionManager:
                 ]),
             }
 
+            # Log Val output to files for debugging
+            log_dir = os.path.expanduser("~/Library/Logs/claude-daemon")
+            val_stdout = open(os.path.join(log_dir, "val-stdout.log"), "w")
+            val_stderr = open(os.path.join(log_dir, "val-stderr.log"), "w")
+
             self._val_proc = subprocess.Popen(
-                [venv_python, main_py, "--mode", "phone"],
+                [
+                    venv_python, main_py,
+                    "--mode", "phone",
+                    "--claude-session", session_id,
+                ],
                 cwd=agent_dir,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
+                stdout=val_stdout,
+                stderr=val_stderr,
                 env=val_env,
             )
+            self._val_log_files = (val_stdout, val_stderr)
 
             log.info(
                 f"Session {session_id} started — "
@@ -137,4 +147,14 @@ class SessionManager:
         self._temporal_proc = None
         self._ngrok_proc = None
         self._session_id = None
+
+        # Close Val log files
+        if hasattr(self, "_val_log_files") and self._val_log_files:
+            for f in self._val_log_files:
+                try:
+                    f.close()
+                except Exception:
+                    pass
+            self._val_log_files = None
+
         log.info("Session stopped")

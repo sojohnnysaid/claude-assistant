@@ -114,18 +114,25 @@ async def _handle_message(
         log.warning(f"Unknown message type: {msg_type}")
 
 
+_shutdown_event = asyncio.Event()
+
+
 async def main() -> None:
     loop = asyncio.get_event_loop()
 
-    async def shutdown():
-        log.info("Shutting down...")
-        await session_mgr.stop()
-        sys.exit(0)
+    def handle_signal():
+        log.info("Signal received, shutting down...")
+        _shutdown_event.set()
 
     for sig in (signal.SIGINT, signal.SIGTERM):
-        loop.add_signal_handler(sig, lambda: asyncio.create_task(shutdown()))
+        loop.add_signal_handler(sig, handle_signal)
 
-    await run_daemon()
+    daemon_task = asyncio.create_task(run_daemon())
+
+    await _shutdown_event.wait()
+    daemon_task.cancel()
+    await session_mgr.stop()
+    log.info("Daemon stopped.")
 
 
 if __name__ == "__main__":
