@@ -33,6 +33,8 @@ Remote voice agent orchestration — start/stop Val sessions on any machine from
   TWILIO_AUTH_TOKEN=<token>
   TWILIO_PHONE_NUMBER=<number>
   NGROK_DOMAIN=<your-ngrok-domain>
+  PLANE_API_KEY=<your-plane-api-token>
+  PLANE_BASE_URL=https://plane.sogos.io
   ```
 
 ### Install the Daemon
@@ -98,6 +100,7 @@ tail -f ~/Library/Logs/claude-daemon/stderr.log
 | API keys (Gemini, ElevenLabs) | Can share the same keys |
 | Twilio credentials | Same account, same phone number |
 | DAEMON_MACHINE_NAME | Yes — unique friendly name |
+| Plane API key | Can share the same key |
 
 ## Development
 
