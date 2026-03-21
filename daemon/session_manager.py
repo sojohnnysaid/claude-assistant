@@ -82,6 +82,7 @@ class SessionManager:
             home = os.path.expanduser("~")
             val_env = {
                 **os.environ,
+                "PYTHONUNBUFFERED": "1",
                 "PATH": os.pathsep.join([
                     os.path.join(home, ".local", "bin"),  # claude CLI
                     "/usr/local/bin",
