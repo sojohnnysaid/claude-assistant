@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: claude-assistant
+  namespace: claude-assistant
+spec:
+  selector:
+    app: claude-assistant
+  ports:
+  - port: 80
+    targetPort: 3000
+  type: ClusterIP
