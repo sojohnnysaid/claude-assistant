@@ -6,6 +6,7 @@ namespace: claude-assistant
 resources:
   - deployment.yaml
   - service.yaml
+  - nginx-config.yaml
 
 labels:
   - pairs:

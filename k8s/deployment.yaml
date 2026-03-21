@@ -18,8 +18,44 @@ spec:
         operator: Exists
         effect: NoSchedule
       containers:
+      # Nginx — single entry point, routes to frontend/backend
+      - name: nginx
+        image: nginxinc/nginx-unprivileged:alpine
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d/
+        resources:
+          requests:
+            memory: "16Mi"
+            cpu: "10m"
+          limits:
+            memory: "32Mi"
+            cpu: "50m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        securityContext:
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          seccompProfile:
+            type: RuntimeDefault
+      # SvelteKit frontend
       - name: frontend
-        image: ghcr.io/sojohnnysaid/claude-assistant:latest
+        image: ghcr.io/sojohnnysaid/claude-assistant-frontend:latest
         ports:
         - containerPort: 3000
         resources:
@@ -29,18 +65,6 @@ spec:
           limits:
             memory: "128Mi"
             cpu: "200m"
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 3000
-          initialDelaySeconds: 10
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 3000
-          initialDelaySeconds: 5
-          periodSeconds: 5
         securityContext:
           runAsNonRoot: true
           runAsUser: 1000
@@ -50,6 +74,35 @@ spec:
             - ALL
           seccompProfile:
             type: RuntimeDefault
+      # FastAPI backend
+      - name: backend
+        image: ghcr.io/sojohnnysaid/claude-assistant-backend:latest
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - secretRef:
+            name: claude-assistant-twilio
+            optional: true
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "25m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          seccompProfile:
+            type: RuntimeDefault
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: nginx-config
       securityContext:
         seccompProfile:
           type: RuntimeDefault

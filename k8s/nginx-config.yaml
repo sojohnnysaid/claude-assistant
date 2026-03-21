@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: claude-assistant
+data:
+  default.conf: |
+    upstream frontend {
+        server 127.0.0.1:3000;
+    }
+    upstream backend {
+        server 127.0.0.1:8000;
+    }
+    server {
+        listen 8080;
+
+        # Backend API
+        location /api/ {
+            proxy_pass http://backend;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+        }
+
+        # Backend WebSocket
+        location /ws/ {
+            proxy_pass http://backend;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $host;
+            proxy_read_timeout 86400;
+        }
+
+        # Twilio fallback
+        location /twilio/ {
+            proxy_pass http://backend;
+            proxy_set_header Host $host;
+        }
+
+        # Backend health (for probes)
+        location /health {
+            proxy_pass http://backend;
+        }
+
+        # Everything else -> frontend
+        location / {
+            proxy_pass http://frontend;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+        }
+    }
