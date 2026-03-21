@@ -78,11 +78,26 @@ class SessionManager:
             venv_python = os.path.join(agent_dir, "venv", "bin", "python")
             main_py = os.path.join(agent_dir, "main.py")
 
+            # Build PATH that includes common CLI locations (claude, ngrok, temporal)
+            home = os.path.expanduser("~")
+            val_env = {
+                **os.environ,
+                "PATH": os.pathsep.join([
+                    os.path.join(home, ".local", "bin"),  # claude CLI
+                    "/usr/local/bin",
+                    "/opt/homebrew/bin",
+                    "/usr/bin",
+                    "/bin",
+                    os.environ.get("PATH", ""),
+                ]),
+            }
+
             self._val_proc = subprocess.Popen(
                 [venv_python, main_py, "--mode", "phone"],
                 cwd=agent_dir,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
+                env=val_env,
             )
 
             log.info(
