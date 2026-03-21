@@ -59,7 +59,7 @@ Remote voice agent orchestration — start/stop Val sessions on any machine from
    ```
    - `DAEMON_MACHINE_NAME` — Friendly name shown in the web UI
    - `DAEMON_VOICE_AGENT_DIR` — Absolute path to the voice agent repo (with working venv and .env)
-   - `NGROK_DOMAIN` — Each machine needs its own ngrok domain (create at ngrok.com dashboard)
+   - `NGROK_DOMAIN` — Same domain across all machines (only one session runs at a time)
 
 4. Install as a macOS background service:
    ```bash
@@ -94,7 +94,7 @@ tail -f ~/Library/Logs/claude-daemon/stderr.log
 
 | Item | Unique per machine? |
 |------|---------------------|
-| ngrok domain | Yes — each machine needs its own |
+| ngrok domain | No — shared (only one session at a time) |
 | API keys (Gemini, ElevenLabs) | Can share the same keys |
 | Twilio credentials | Same account, same phone number |
 | DAEMON_MACHINE_NAME | Yes — unique friendly name |
