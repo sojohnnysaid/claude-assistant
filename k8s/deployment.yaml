@@ -42,10 +42,14 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 5
         securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
           allowPrivilegeEscalation: false
           capabilities:
             drop:
             - ALL
+          seccompProfile:
+            type: RuntimeDefault
       securityContext:
         seccompProfile:
           type: RuntimeDefault
