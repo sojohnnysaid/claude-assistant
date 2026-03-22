@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: livekit-server
-  namespace: livekit
+  namespace: claude-assistant
   labels:
     app: livekit-server
 spec:
@@ -15,7 +15,6 @@ spec:
       labels:
         app: livekit-server
     spec:
-      serviceAccountName: tailscale
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       containers:
