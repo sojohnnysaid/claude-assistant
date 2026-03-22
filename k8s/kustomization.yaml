@@ -7,10 +7,8 @@ resources:
   - deployment.yaml
   - service.yaml
   - nginx-config.yaml
-  - livekit-deployment.yaml
-  - livekit-service.yaml
-  - livekit-config.yaml
-  - livekit-secrets.yaml
+  # LiveKit resources are in the 'livekit' namespace — managed separately
+  # See k8s/livekit-*.yaml files, applied directly via kubectl
 
 labels:
   - pairs:
