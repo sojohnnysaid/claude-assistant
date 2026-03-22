@@ -7,6 +7,10 @@ resources:
   - deployment.yaml
   - service.yaml
   - nginx-config.yaml
+  - livekit-deployment.yaml
+  - livekit-service.yaml
+  - livekit-config.yaml
+  - livekit-secrets.yaml
 
 labels:
   - pairs:
